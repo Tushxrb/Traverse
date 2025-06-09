@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block body %}
+<div class="container my-5">
+  <h2>{{ user.get_full_name }}'s Dashboard</h2>
+  <form method="post" action="{% url 'employee_logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Logout</button>
+  </form>
+  <!-- Add more employee dashboard content here -->
+</div>
+{% endblock %}

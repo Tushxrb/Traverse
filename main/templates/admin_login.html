@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Login{% endblock %}
+
+{% block body %}
+<style>
+  #bg-video {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100vw;
+    min-height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+  }
+</style>
+
+<!-- Background video -->
+<video autoplay muted loop id="bg-video">
+  <source src="{% static 'images/login_background.mp4' %}" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+<div class="login-container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+  <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
+    <h4 class="mb-3 text-center">Admin Login</h4>
+    <form method="post">
+      {% csrf_token %}
+      {% if form.errors %}
+        <div class="alert alert-danger">Invalid username or password</div>
+      {% endif %}
+      <div class="mb-3">
+        <label for="id_username" class="form-label">Username</label>
+        <input type="text" name="employee_id" class="form-control" id="id_username" required />
+      </div>
+      <div class="mb-3">
+        <label for="id_password" class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" id="id_password" required />
+      </div>
+      <div class="d-grid">
+        <button type="submit" class="btn btn-danger">Login</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

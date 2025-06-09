@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block body %}
+<div class="container my-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Admin Dashboard</h2>
+    <form method="post" action="{% url 'admin_logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Logout</button>
+    </form>
+  </div>
+
+  <form method="post" class="row g-3 mb-5">
+    {% csrf_token %}
+    <div class="col-md-3">
+      <label for="id_first_name" class="form-label">First Name</label>
+      <input type="text" id="id_first_name" name="first_name" class="form-control" placeholder="John" required />
+    </div>
+    <div class="col-md-3">
+      <label for="id_last_name" class="form-label">Last Name</label>
+      <input type="text" id="id_last_name" name="last_name" class="form-control" placeholder="Doe" required />
+    </div>
+    <div class="col-md-2">
+      <label for="id_dob" class="form-label">DOB</label>
+      <input type="date" id="id_dob" name="dob" class="form-control" required />
+    </div>
+    <div class="col-md-2">
+      <label for="id_address" class="form-label">Address</label>
+      <select id="id_address" name="address" class="form-select">
+        {% for addr in addresses %}
+          <option value="{{ addr }}">{{ addr }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label for="id_employee_id_digits" class="form-label">Employee ID Digits</label>
+      <input type="text" id="id_employee_id_digits" name="employee_id_digits" class="form-control" placeholder="0001" pattern="\d+" required />
+    </div>
+    <div class="col-md-4 d-flex align-items-center">
+      <input type="checkbox" id="id_is_super_employee" name="is_super_employee" class="form-check-input me-2" />
+      <label for="id_is_super_employee" class="form-check-label mb-0">Is Super Employee?</label>
+    </div>
+    <div class="col-md-8">
+      <label for="id_team_leader" class="form-label">Team Leader (if employee)</label>
+      <select id="id_team_leader" name="team_leader" class="form-select">
+        <option value="">-- None --</option>
+        {% for tl in team_leaders %}
+          <option value="{{ tl.id }}">{{ tl.get_full_name }} ({{ tl.employee_id }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-12">
+      <button type="submit" class="btn btn-success">Add User</button>
+    </div>
+  </form>
+
+  <hr />
+
+  <h4>Existing Users</h4>
+  <ul class="list-group">
+    {% for user in employees %}
+      <li class="list-group-item">
+        <form method="post" action="{% url 'update_users' %}" class="row align-items-center g-1">
+          {% csrf_token %}
+          <input type="hidden" name="save_id" value="{{ user.id }}" />
+
+          <div class="col-3">
+            <label class="form-label small" for="first_name_{{ user.id }}">{{ user.first_name }} {{ user.last_name }} ({{ user.employee_id }})</label>
+            <input type="text" id="first_name_{{ user.id }}" name="first_name_{{ user.id }}" class="form-control form-control-sm mb-1" value="{{ user.first_name }}" required />
+            <input type="text" name="last_name_{{ user.id }}" class="form-control form-control-sm" value="{{ user.last_name }}" required />
+          </div>
+
+          <div class="col-2">
+            <input type="date" name="dob_{{ user.id }}" class="form-control form-control-sm" value="{{ user.dob|date:'Y-m-d' }}" required />
+          </div>
+
+          <div class="col-2">
+            <select name="address_{{ user.id }}" class="form-select form-select-sm" required>
+              {% for addr in addresses %}
+                <option value="{{ addr }}" {% if user.address == addr %}selected{% endif %}>{{ addr }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-2">
+            <select name="team_leader_{{ user.id }}" class="form-select form-select-sm">
+              <option value="">-- None --</option>
+              {% for tl in team_leaders %}
+                {% if user.id != tl.id %}
+                  <option value="{{ tl.id }}" {% if user.team_leader and user.team_leader.id == tl.id %}selected{% endif %}>
+                    {{ tl.get_full_name }} ({{ tl.employee_id }})
+                  </option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-1 text-center">
+            <input type="checkbox" name="is_super_employee_{{ user.id }}" class="form-check-input" {% if user.is_super_employee %}checked{% endif %} />
+          </div>
+
+          <div class="col-2 text-muted small">
+            {% if user.email %}
+              {{ user.email }}
+            {% else %}
+              <span class="text-muted">not yet signed up</span>
+            {% endif %}
+            <div class="d-flex mt-1">
+              <button type="submit" class="btn btn-sm btn-primary me-1">Save</button>
+            </div>
+          </div>
+        </form>
+
+        <form method="post" action="{% url 'delete_user' user.id %}" class="mt-1">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </li>
+    {% empty %}
+      <li class="list-group-item">No users found.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

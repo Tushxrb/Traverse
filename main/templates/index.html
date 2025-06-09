@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Traverse | Login{% endblock %}
+
+{% block body %}
+<style>
+  .login-container {
+    background: white;
+    padding: 2rem 3rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 320px;
+    margin: 5rem auto; /* center horizontally and add some top margin */
+  }
+
+  .login-container h2 {
+    margin-bottom: 1.5rem;
+    color: #1e7457;
+  }
+
+  .it-vedant{
+    width: 200px;
+    height: auto;
+  }
+  .btn-login {
+    display: block;
+    width: 100%;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    padding: 0.5rem 0;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 1.1rem;
+  }
+  .btn-employee {
+    background-color: #D3D3D3;
+    color: white;
+    border: none;
+  }
+  .btn-employee:hover {
+    background-color: #155b3e;
+    color: white;
+  }
+  .btn-admin {
+    background-color: #DC3545;
+    color: white;
+    border: none;
+  }
+  .btn-admin:hover {
+    background-color: #b30003;
+    color: white;
+  }
+
+  #bg-video {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100vw;
+    min-height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+  }
+</style>
+
+<!-- Background video -->
+<video autoplay muted loop id="bg-video">
+  <source src="{% static 'images/login_background.mp4' %}" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+<!-- Login card -->
+
+<div class="login-container">
+  <img src="{% static 'images/it-vedant.png' %}" class="it-vedant" alt="company-logo"></img>
+  <hr>
+  <a href="{% url 'employee_login' %}" class="btn-login btn-employee">Login as Employee</a>
+  <a href="{% url 'admin_login' %}" class="btn-login btn-admin">Login as Admin</a>
+</div>
+
+{% endblock %}
