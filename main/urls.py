@@ -22,4 +22,11 @@ urlpatterns = [
     path('employee_logout/', views.employee_logout, name='employee_logout'),
 
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/save/', views.save_schedule, name='save_schedule'),
+    path('dashboard/cutoff/', views.cutoff_view, name='cutoff_schedule'),
+    path('dashboard/save_team/', views.save_team_schedule, name='save_team_schedule'),
+    path('pricing/', views.pricing, name='pricing'),
+
+    # Payment
+    path('start-payment/', views.start_payment, name='start_payment'),
 ]

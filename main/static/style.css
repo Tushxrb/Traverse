@@ -1,0 +1,35 @@
+.logo {
+  max-width: 150px;
+  width: 100%;
+  height: auto;
+}
+
+.theme {
+  background-color: #1e7457;
+}
+
+.navbar-nav .nav-link {
+  color: white !important;
+  position: relative;
+  text-decoration: none;
+}
+
+.navbar-nav .nav-link::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: white;
+  transition: width 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover::after {
+  width: 100%;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+}

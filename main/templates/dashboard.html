@@ -1,12 +1,165 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard{% endblock %}
+
 {% block body %}
 <div class="container my-5">
   <h2>{{ user.get_full_name }}'s Dashboard</h2>
+
   <form method="post" action="{% url 'employee_logout' %}">
       {% csrf_token %}
       <button type="submit" class="btn btn-danger">Logout</button>
   </form>
-  <!-- Add more employee dashboard content here -->
+
+  <hr>
+
+  <h4>Your Schedule</h4>
+  <form method="post" action="{% url 'save_schedule' %}">
+    {% csrf_token %}
+    <input type="hidden" name="user_id" value="{{ user.id }}">
+
+    <table class="table table-bordered">
+      <thead class="table-dark">
+        <tr>
+          <th>Day</th>
+          <th>Date</th>
+          <th>Type</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for date, day in week_dates %}
+        <tr>
+          <td>{{ day }}</td>
+          <td><input type="text" class="form-control" name="dates" value="{{ date }}" readonly></td>
+          <td>
+            <select class="form-select type-select" name="types">
+              <option value="">--Select--</option>
+              <option value="pickup">Pickup</option>
+              <option value="drop">Drop</option>
+            </select>
+          </td>
+          <td>
+            <select class="form-select time-select" name="timings">
+              <option value="">Select timing</option>
+            </select>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Save Schedule</button>
+  </form>
+
+  <hr>
+
+  {% if is_super_employee %}
+  <h4>Team Members' Schedule</h4>
+  <div class="mb-3">
+    <label for="team-select">Select Team Member:</label>
+    <select id="team-select" class="form-select" onchange="showTeamTable(this.value)">
+      <option value="">Select...</option>
+      {% for member in team_members %}
+      <option value="{{ member.id }}">{{ member.get_full_name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div id="team-table-container"></div>
+  {% endif %}
+
+  <hr>
+
+  <form method="post" action="{% url 'cutoff_schedule' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-warning">Cutoff & Export to Excel</button>
+  </form>
 </div>
+
+<script>
+function getTimeOptions(type) {
+  const times = [];
+  let start = 0, end = 0;
+  if (type === 'pickup') { start = 7 * 60; end = 9 * 60; }
+  else if (type === 'drop') { start = 18 * 60; end = 24 * 60; }
+
+  for (let t = start; t <= end; t += 30) {
+    let hr = String(Math.floor(t / 60)).padStart(2, '0');
+    let min = t % 60 === 0 ? '00' : '30';
+    times.push(`${hr}:${min}`);
+  }
+  return times;
+}
+
+document.querySelectorAll('.type-select').forEach((typeSelect, idx) => {
+  typeSelect.addEventListener('change', () => {
+    const timeSelect = document.querySelectorAll('.time-select')[idx];
+    timeSelect.innerHTML = '<option value="">Select timing</option>';
+    const opts = getTimeOptions(typeSelect.value);
+    opts.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t;
+      opt.text = t;
+      timeSelect.appendChild(opt);
+    });
+  });
+});
+
+function showTeamTable(memberId) {
+  const container = document.getElementById('team-table-container');
+  if (!memberId) {
+    container.innerHTML = '';
+    return;
+  }
+
+  const weekDates = {{ week_dates_json|safe }};
+  let html = `
+    <form method="post" action="{% url 'save_team_schedule' %}">
+      {% csrf_token %}
+      <input type="hidden" name="team_member_id" value="${memberId}">
+      <table class="table table-bordered">
+        <thead class="table-dark">
+          <tr><th>Day</th><th>Date</th><th>Type</th><th>Time</th></tr>
+        </thead>
+        <tbody>`;
+  weekDates.forEach(([date, day]) => {
+    html += `
+      <tr>
+        <td>${day}</td>
+        <td><input type="text" name="dates" class="form-control" value="${date}" readonly></td>
+        <td>
+          <select class="form-select team-type-select" name="types">
+            <option value="">--Select--</option>
+            <option value="pickup">Pickup</option>
+            <option value="drop">Drop</option>
+          </select>
+        </td>
+        <td>
+          <select class="form-select team-time-select" name="timings">
+            <option value="">Select timing</option>
+          </select>
+        </td>
+      </tr>`;
+  });
+  html += `
+        </tbody>
+      </table>
+      <button type="submit" class="btn btn-secondary">Save Team Schedule</button>
+    </form>`;
+  container.innerHTML = html;
+
+  document.querySelectorAll('.team-type-select').forEach((typeSelect, idx) => {
+    typeSelect.addEventListener('change', () => {
+      const timeSelect = document.querySelectorAll('.team-time-select')[idx];
+      timeSelect.innerHTML = '<option value="">Select timing</option>';
+      const opts = getTimeOptions(typeSelect.value);
+      opts.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.text = t;
+        timeSelect.appendChild(opt);
+      });
+    });
+  });
+}
+</script>
 {% endblock %}

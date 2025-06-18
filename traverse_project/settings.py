@@ -115,7 +115,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 import os
 
@@ -138,3 +138,6 @@ EMAIL_HOST_PASSWORD = "bzqp utss upmq hfgt"
 # Login URLs
 LOGIN_URL = '/admin_login/'
 LOGIN_REDIRECT_URL = '/admin_dashboard/'
+
+RAZORPAY_KEY_ID = 'rzp_test_dTu1n1MCiGAPqi'
+RAZORPAY_KEY_SECRET = '0wivtTHD9Eqi10QyuQVewHjQ'

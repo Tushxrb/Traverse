@@ -27,6 +27,13 @@
     <h4 class="mb-3 text-center">Admin Login</h4>
     <form method="post">
       {% csrf_token %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} text-center" role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
       {% if form.errors %}
         <div class="alert alert-danger">Invalid username or password</div>
       {% endif %}

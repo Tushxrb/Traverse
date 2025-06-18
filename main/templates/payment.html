@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Traverse | Payment {% endblock %}
+
+{% block body %}
+      <div style="margin: 100px auto; max-width: 400px; text-align: center">
+        <h2>Are you sure?</h2>
+        <p>
+          You are about to pay <strong>₹{{ display_amount }}</strong>.
+        </p>
+        <button id="rzp-button" class="btn btn-primary">Yes, Pay Now</button>
+        <a href="{% url 'pricing' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+var options = {
+    "key": "{{ razorpay_key_id }}",
+    "amount": "{{ amount }}", // paise for Razorpay
+    "currency": "INR",
+    "order_id": "{{ order_id }}",
+    "handler": function (response){
+        // Redirect to index page after successful payment
+        window.location.href = "{% url 'index' %}";
+    }
+};
+var rzp1 = new Razorpay(options);
+document.getElementById('rzp-button').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+</script>
+    {% endblock %}
+</html>
