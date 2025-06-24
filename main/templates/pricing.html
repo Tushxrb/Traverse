@@ -1,5 +1,6 @@
-{% extends 'base.html' %} {% load static %} {% block title %}Traverse |
-Pricing{% endblock %} {% block body %}
+{% extends 'base.html' %} {% load static %} 
+{% block title %}Traverse | Pricing{% endblock %} 
+{% block body %}
 <style>
   body {
     margin-top: 20px;
@@ -152,7 +153,7 @@ Pricing{% endblock %} {% block body %}
           <form action="{% url 'start_payment' %}" method="POST">
             {% csrf_token %}
             <input type="hidden" name="plan" value="starter">
-            <button type="submit">Get Started (Starter)</button>
+            <button type="submit" class="btn btn-success w-100 mt-2">Get Started (Starter)</button>
           </form>
         </div>
       </div>
@@ -179,7 +180,7 @@ Pricing{% endblock %} {% block body %}
           <form action="{% url 'start_payment' %}" method="POST">
             {% csrf_token %}
             <input type="hidden" name="plan" value="popular">
-            <button type="submit">Get Started (Popular)</button>
+            <button type="submit" class="btn btn-success w-100 mt-2">Get Started (Popular)</button>
           </form>
         </div>
       </div>
@@ -208,7 +209,7 @@ Pricing{% endblock %} {% block body %}
           <form action="{% url 'start_payment' %}" method="POST">
             {% csrf_token %}
             <input type="hidden" name="plan" value="premium">
-            <button type="submit">Get Started (Premium)</button>
+            <button type="submit" class="btn btn-success w-100 mt-2">Get Started (Premium)</button>
           </form>
         </div>
       </div>
