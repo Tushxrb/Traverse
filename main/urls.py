@@ -16,16 +16,20 @@ urlpatterns = [
     path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('delete-user/<int:user_id>/', views.delete_user, name='delete_user'),
     path('admin-dashboard/update/', views.update_users, name='update_users'),
+    path('admin-tools/cutoff/', views.cutoff_schedule, name='cutoff_schedule'),  # Moved to admin section
 
     # Logout
     path('admin_logout/', views.admin_logout, name='admin_logout'),
     path('employee_logout/', views.employee_logout, name='employee_logout'),
 
+    # Employee Dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
     path('dashboard/save/', views.save_schedule, name='save_schedule'),
-    path('dashboard/cutoff/', views.cutoff_schedule, name='cutoff_schedule'),
     path('dashboard/save_team/', views.save_team_schedule, name='save_team_schedule'),
+    
+    # Other pages
     path('pricing/', views.pricing, name='pricing'),
+    path('api/current-schedule/', views.get_current_schedule, name='get_current_schedule'),
 
     # Payment
     path('start-payment/', views.start_payment, name='start_payment'),

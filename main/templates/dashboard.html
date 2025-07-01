@@ -25,19 +25,49 @@
       <!-- Current Schedule Display -->
       <div class="card mb-4">
         <div class="card-header">
-          <h5>Current Schedule</h5>
+          <h5>Next Week's Schedule</h5>
         </div>
         <div class="card-body">
-          <div id="current-schedule">
-            <p class="text-muted">Loading current schedule...</p>
-          </div>
+          {% if current_schedules %}
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Day</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for schedule in current_schedules %}
+                  <tr>
+                    <td>{{ schedule.day }}</td>
+                    <td>{{ schedule.date|date:"Y-m-d" }}</td>
+                    <td>
+                      <span class="badge bg-{% if schedule.type == 'pickup' %}success{% else %}warning{% endif %}">
+                        {{ schedule.type|title }}
+                      </span>
+                    </td>
+                    <td>{{ schedule.timing }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i>
+              No schedule set for this week. Please use the form below to set your schedule.
+            </div>
+          {% endif %}
         </div>
       </div>
 
       <!-- Schedule Form -->
       <div class="card mb-4">
         <div class="card-header">
-          <h5>Set Your Schedule</h5>
+          <h5>Set Next Week's Schedule</h5>
         </div>
         <div class="card-body">
           <form method="post" action="{% url 'save_schedule' %}">
@@ -147,6 +177,49 @@ function getTimeOptions(type) {
     times.push(`${hr}:${min}`);
   }
   return times;
+}
+
+// Pre-populate form with existing schedule data
+function populateExistingSchedule() {
+  const existingSchedule = {{ current_schedules|yesno:"true,false" }};
+  if (!existingSchedule) return;
+
+  const scheduleData = [
+    {% for schedule in current_schedules %}
+    {
+      date: '{{ schedule.date|date:"Y-m-d" }}',
+      type: '{{ schedule.type }}',
+      timing: '{{ schedule.timing }}'
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  const dateInputs = document.querySelectorAll('input[name="dates"]');
+  const typeSelects = document.querySelectorAll('.type-select');
+  const timeSelects = document.querySelectorAll('.time-select');
+
+  scheduleData.forEach(schedule => {
+    dateInputs.forEach((dateInput, idx) => {
+      if (dateInput.value === schedule.date) {
+        // Set type
+        typeSelects[idx].value = schedule.type;
+        
+        // Populate time options
+        const timeSelect = timeSelects[idx];
+        timeSelect.innerHTML = '<option value="">Select timing</option>';
+        const timeOptions = getTimeOptions(schedule.type);
+        timeOptions.forEach(time => {
+          const option = document.createElement('option');
+          option.value = time;
+          option.text = time;
+          timeSelect.appendChild(option);
+        });
+        
+        // Set selected time
+        timeSelect.value = schedule.timing;
+      }
+    });
+  });
 }
 
 // Initialize main schedule form
@@ -273,12 +346,8 @@ function showTeamTable(memberId) {
 
 // Load current schedule on page load
 document.addEventListener('DOMContentLoaded', function() {
-  // This would be enhanced with an AJAX call to fetch current schedule
-  // For now, we'll show a placeholder
-  document.getElementById('current-schedule').innerHTML = `
-    <p class="text-info">Select your schedule for the week and click "Save Schedule" to update.</p>
-    <small class="text-muted">Your current schedule will be displayed here after saving.</small>
-  `;
+  // Pre-populate the form with existing schedule data
+  populateExistingSchedule();
 });
 </script>
 
