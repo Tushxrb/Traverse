@@ -1,0 +1,574 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Traverse |
+Services{% endblock %} {% block body %}
+<style>
+  .hero-section {
+    background: linear-gradient(135deg, #1e7457 0%, #155b3e 100%);
+    color: white;
+    padding: 100px 0 60px;
+    margin-top: 80px;
+    position: relative;
+    min-height: 260px;
+  }
+
+  /* Vertically center the logo in the hero-section background, not just the column */
+  .hero-logo-centered {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 200px;
+    max-height: 120px;
+    object-fit: contain;
+    display: block;
+    margin: 0;
+    z-index: 2;
+  }
+
+  .hero-section h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .hero-section p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+  }
+
+  .service-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    margin-top: 2.5rem; /* Increase margin for more vertical gap */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #eee;
+    height: 100%;
+  }
+
+  .service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(30, 116, 87, 0.15);
+  }
+
+  .service-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #1e7457, #155b3e);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    color: white;
+    font-size: 1.8rem;
+  }
+
+  .service-card h4 {
+    color: #1e7457;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+  }
+
+  .service-card p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .feature-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .feature-list li {
+    padding: 0.5rem 0;
+    color: #555;
+    position: relative;
+    padding-left: 1.5rem;
+  }
+
+  .feature-list li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #1e7457;
+    font-weight: bold;
+  }
+
+  .stats-section {
+    background: #f8f9fa;
+    padding: 60px 0;
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #1e7457;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-label {
+    color: #666;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .cta-section {
+    background: linear-gradient(135deg, #1e7457 0%, #155b3e 100%);
+    color: white;
+    padding: 80px 0;
+    text-align: center;
+  }
+
+  .cta-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .cta-section p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+  }
+
+  .btn-cta {
+    background: white;
+    color: #1e7457;
+    padding: 15px 40px;
+    border-radius: 50px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    border: 2px solid white;
+  }
+
+  .btn-cta:hover {
+    background: transparent;
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .section-padding {
+    padding: 80px 0;
+  }
+
+  .section-title {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .section-title h2 {
+    font-size: 2.5rem;
+    color: #1e7457;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .section-title p {
+    font-size: 1.1rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .process-step {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .process-number {
+    width: 60px;
+    height: 60px;
+    background: #1e7457;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 auto 1rem;
+  }
+
+  .process-step h5 {
+    color: #1e7457;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero-section h1 {
+      font-size: 2rem;
+    }
+
+    .hero-section p {
+      font-size: 1rem;
+    }
+
+    .service-card {
+      margin-bottom: 2rem;
+      margin-top: 2rem;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+    }
+  }
+</style>
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h1>Comprehensive Employee Management Solutions</h1>
+        <p>
+          Streamline your workforce operations with our cutting-edge employee
+          scheduling, transportation, and management platform designed for
+          modern businesses.
+        </p>
+      </div>
+      <div class="col-lg-4 position-relative" style="min-height: 180px;">
+        <img
+          src="{% static 'images/traverse_logo.png' %}"
+          alt="Traverse Services"
+          class="img-fluid hero-logo-centered"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Core Services Section -->
+<section class="section-padding">
+  <div class="container">
+    <div class="section-title">
+      <h2>Our Core Services</h2>
+      <p>
+        Discover how Traverse can transform your employee management and
+        operational efficiency
+      </p>
+    </div>
+
+    <div class="row">
+      <!-- Employee Management -->
+      <div class="col-lg-4 col-md-6">
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h4>Employee Management</h4>
+          <p>
+            Complete employee lifecycle management from onboarding to
+            performance tracking.
+          </p>
+          <ul class="feature-list">
+            <li>Digital employee profiles</li>
+            <li>Hierarchical team structures</li>
+            <li>Role-based access control</li>
+            <li>Real-time employee tracking</li>
+            <li>Performance analytics</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Schedule Management -->
+      <div class="col-lg-4 col-md-6">
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <h4>Smart Scheduling</h4>
+          <p>
+            Intelligent scheduling system that optimizes workforce allocation
+            and reduces conflicts.
+          </p>
+          <ul class="feature-list">
+            <li>Automated schedule generation</li>
+            <li>Conflict detection & resolution</li>
+            <li>Mobile schedule access</li>
+            <li>Real-time updates</li>
+            <li>Excel export capabilities</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Transportation Management -->
+      <div class="col-lg-4 col-md-6">
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-bus"></i>
+          </div>
+          <h4>Transportation Services</h4>
+          <p>
+            Comprehensive employee transportation management with pickup and
+            drop scheduling.
+          </p>
+          <ul class="feature-list">
+            <li>Route optimization</li>
+            <li>Pickup/drop scheduling</li>
+            <li>Vendor coordination</li>
+            <li>Real-time tracking</li>
+            <li>Cost optimization</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Admin Dashboard -->
+      <div class="col-lg-4 col-md-6">
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-tachometer-alt"></i>
+          </div>
+          <h4>Admin Dashboard</h4>
+          <p>
+            Powerful administrative interface for complete system control and
+            monitoring.
+          </p>
+          <ul class="feature-list">
+            <li>Comprehensive reporting</li>
+            <li>User management tools</li>
+            <li>System configuration</li>
+            <li>Data export options</li>
+            <li>Security controls</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Team Leadership -->
+      <div class="col-lg-4 col-md-6">
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-user-tie"></i>
+          </div>
+          <h4>Team Leadership Tools</h4>
+          <p>
+            Empower team leaders with advanced tools for managing their teams
+            effectively.
+          </p>
+          <ul class="feature-list">
+            <li>Team member oversight</li>
+            <li>Schedule management</li>
+            <li>Performance tracking</li>
+            <li>Communication tools</li>
+            <li>Reporting capabilities</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Security & Compliance -->
+      <div class="col-lg-4 col-md-6">
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h4>Security & Compliance</h4>
+          <p>
+            Enterprise-grade security with comprehensive compliance management.
+          </p>
+          <ul class="feature-list">
+            <li>Data encryption</li>
+            <li>Access controls</li>
+            <li>Audit trails</li>
+            <li>Compliance reporting</li>
+            <li>Backup & recovery</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="section-padding" style="background: #f8f9fa">
+  <div class="container">
+    <div class="section-title">
+      <h2>How Traverse Works</h2>
+      <p>
+        Simple, efficient, and powerful - here's how our platform streamlines
+        your operations
+      </p>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-3 col-md-6">
+        <div class="process-step">
+          <div class="process-number">1</div>
+          <h5>Setup & Onboarding</h5>
+          <p>
+            Quick setup with employee data import and system configuration
+            tailored to your needs.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="process-step">
+          <div class="process-number">2</div>
+          <h5>Schedule Creation</h5>
+          <p>
+            Employees create their schedules through our intuitive interface
+            with smart conflict detection.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="process-step">
+          <div class="process-number">3</div>
+          <h5>Optimization & Export</h5>
+          <p>
+            System optimizes schedules and exports to Excel for vendor
+            coordination and management.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="process-step">
+          <div class="process-number">4</div>
+          <h5>Monitor & Manage</h5>
+          <p>
+            Real-time monitoring with comprehensive reporting and analytics for
+            continuous improvement.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+          <div class="stat-number">500+</div>
+          <div class="stat-label">Employees Managed</div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+          <div class="stat-number">99.9%</div>
+          <div class="stat-label">Uptime Guarantee</div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+          <div class="stat-number">24/7</div>
+          <div class="stat-label">Customer Support</div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+          <div class="stat-number">50+</div>
+          <div class="stat-label">Companies Trust Us</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Showcase -->
+<section class="section-padding">
+  <div class="container">
+    <div class="section-title">
+      <h2>Why Choose Traverse?</h2>
+      <p>
+        Discover the advantages that make Traverse the preferred choice for
+        employee management
+      </p>
+    </div>
+
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <div class="service-card">
+          <h4><i class="fas fa-mobile-alt me-2"></i>Mobile-First Design</h4>
+          <p>
+            Access your schedules and manage your team from anywhere with our
+            responsive, mobile-optimized interface.
+          </p>
+
+          <h4><i class="fas fa-bolt me-2"></i>Real-Time Updates</h4>
+          <p>
+            Instant notifications and updates ensure everyone stays informed
+            about schedule changes and important announcements.
+          </p>
+
+          <h4><i class="fas fa-chart-line me-2"></i>Advanced Analytics</h4>
+          <p>
+            Comprehensive reporting and analytics provide insights into
+            workforce efficiency and operational patterns.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="service-card">
+          <h4><i class="fas fa-cogs me-2"></i>Customizable Workflows</h4>
+          <p>
+            Adapt the system to match your organization's unique processes and
+            operational requirements.
+          </p>
+
+          <h4><i class="fas fa-cloud me-2"></i>Cloud-Based Solution</h4>
+          <p>
+            Secure, scalable cloud infrastructure ensures your data is safe and
+            accessible from anywhere.
+          </p>
+
+          <h4><i class="fas fa-headset me-2"></i>Dedicated Support</h4>
+          <p>
+            Our expert support team is available 24/7 to help you maximize the
+            value of your Traverse investment.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center">
+        <h2>Ready to Transform Your Workforce Management?</h2>
+        <p>
+          Join hundreds of companies already using Traverse to streamline their
+          employee management and boost operational efficiency.
+        </p>
+        <div class="mt-4">
+          <a href="{% url 'pricing' %}" class="btn-cta me-3"
+            >View Pricing Plans</a
+          >
+          <a href="{% url 'employee_login' %}" class="btn-cta"
+            >Get Started Today</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Font Awesome for icons -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+/>
+
+{% endblock %}

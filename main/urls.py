@@ -29,6 +29,7 @@ urlpatterns = [
     
     # Other pages
     path('pricing/', views.pricing, name='pricing'),
+    path('services/', views.services, name='services'),
     path('api/current-schedule/', views.get_current_schedule, name='get_current_schedule'),
 
     # Payment

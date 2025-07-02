@@ -57,13 +57,23 @@ def employee_login(req):
 
             # Find user by employee ID
             user = User.objects.filter(employee_id=emp_id).first()
+
             if not user:
-                messages.error(req, 'Employee not found.')
+                messages.error(req, 'No employee found with this Employee ID.')
+                return render(req, 'employee_login.html')
+
+            # Prevent admin login from employee login page
+            if user.is_superuser:
+                messages.error(req, 'You are an admin. Please use the Admin Login page.')
                 return render(req, 'employee_login.html')
 
             # If user has no email, use DOB as password for first login
             if not user.email or not user.email.strip():
-                expected_dob = user.dob.strftime('%d%m%Y')
+                try:
+                    expected_dob = user.dob.strftime('%d%m%Y')
+                except Exception:
+                    messages.error(req, 'User record is missing Date of Birth. Please contact admin.')
+                    return render(req, 'employee_login.html')
                 if input_value == expected_dob:
                     req.session['emp_id'] = emp_id
                     req.session['dob'] = expected_dob
@@ -78,7 +88,7 @@ def employee_login(req):
                 login(req, auth_user)
                 return redirect('dashboard')
             else:
-                messages.error(req, 'Invalid credentials.')
+                messages.error(req, 'Invalid Employee ID or Password.')
                 return render(req, 'employee_login.html')
 
         # Show login page for GET request
@@ -382,12 +392,12 @@ def update_users(req):
 def admin_logout(request):
     # Log out admin
     logout(request)
-    return redirect('admin_login')
+    return redirect('index')
 
 def employee_logout(request):
     # Log out employee
     logout(request)
-    return redirect('employee_login')
+    return redirect('index')
 
 @login_required
 def save_schedule(request):
@@ -648,3 +658,6 @@ def start_payment(request):
             
     # Show pricing page for GET request
     return render(request, "pricing.html")
+
+def services(request):
+    return render(request, "services.html")
