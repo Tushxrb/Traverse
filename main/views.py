@@ -124,18 +124,52 @@ def reset_password(req):
 
         session_otp = req.session.get('otp')
         session_email = req.session.get('reset_email')
+        otp_verified = req.session.get('otp_verified', False)
 
-        # Check OTP and email
-        if not session_otp or otp != str(session_otp) or email != session_email: 
-            return render(req, 'reset_password.html', { 'emp_id': emp_id, 'otp_verified': False, 'error': 'Invalid OTP or email mismatch.' }) 
+        # Check if OTP was verified through AJAX or validate it now
+        if not otp_verified and (not session_otp or otp != str(session_otp) or email != session_email):
+            return render(req, 'reset_password.html', { 
+                'emp_id': emp_id, 
+                'otp_verified': False, 
+                'email': email,
+                'entered_otp': otp,
+                'error': 'Invalid OTP or email mismatch.' 
+            }) 
         
-        # Check if passwords match
-        if password1 != password2:
-            return render(req, 'reset_password.html', { 'emp_id': emp_id, 'otp_verified': True, 'email': email, 'error': 'Passwords do not match.' }) 
+        # If OTP verification passed, mark it as verified for subsequent checks
+        if session_otp and otp == str(session_otp) and email == session_email:
+            req.session['otp_verified'] = True
+            otp_verified = True
         
         # Check if email is provided
         if not email: 
-            return render(req, 'reset_password.html', { 'emp_id': emp_id, 'otp_verified': True, 'error': 'Email is required.' }) 
+            return render(req, 'reset_password.html', { 
+                'emp_id': emp_id, 
+                'otp_verified': otp_verified, 
+                'email': email,
+                'entered_otp': otp,
+                'error': 'Email is required.' 
+            }) 
+        
+        # Check if passwords match
+        if password1 != password2:
+            return render(req, 'reset_password.html', { 
+                'emp_id': emp_id, 
+                'otp_verified': otp_verified, 
+                'email': email, 
+                'entered_otp': otp,
+                'error': 'Passwords do not match.' 
+            }) 
+        
+        # Check password strength (optional - you can add more validations)
+        if len(password1) < 6:
+            return render(req, 'reset_password.html', { 
+                'emp_id': emp_id, 
+                'otp_verified': otp_verified, 
+                'email': email, 
+                'entered_otp': otp,
+                'error': 'Password must be at least 6 characters long.' 
+            })
         
         # Set email and new password
         user.email = email 
@@ -145,6 +179,7 @@ def reset_password(req):
         # Clear session data
         req.session.pop('otp', None) 
         req.session.pop('reset_email', None) 
+        req.session.pop('otp_verified', None) 
         req.session.pop('emp_id', None) 
         req.session.pop('dob', None) 
 
@@ -152,7 +187,12 @@ def reset_password(req):
         return redirect('employee_login') 
     
     # Show reset password page
-    return render(req, 'reset_password.html', {'emp_id': emp_id, 'otp_verified': False})
+    return render(req, 'reset_password.html', {
+        'emp_id': emp_id, 
+        'otp_verified': req.session.get('otp_verified', False),
+        'email': req.session.get('reset_email', ''),
+        'entered_otp': ''
+    })
 
 @ensure_csrf_cookie
 def verify_otp(req):
