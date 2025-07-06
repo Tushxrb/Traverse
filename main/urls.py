@@ -4,6 +4,7 @@ from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('login_page/', views.login_page, name='login_page'),
 
     # Employee URLs
     path('employee_login/', views.employee_login, name='employee_login'),
@@ -16,8 +17,9 @@ urlpatterns = [
     path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('delete-user/<int:user_id>/', views.delete_user, name='delete_user'),
     path('admin-dashboard/update/', views.update_users, name='update_users'),
-    path('admin-tools/cutoff/', views.cutoff_schedule, name='cutoff_schedule'),  # Moved to admin section
-
+    path('admin-tools/cutoff/', views.cutoff_schedule, name='cutoff_schedule'), 
+    path('admin-tools/admin_reset_password/', views.admin_reset_password, name='admin_reset_password'), 
+    
     # Logout
     path('admin_logout/', views.admin_logout, name='admin_logout'),
     path('employee_logout/', views.employee_logout, name='employee_logout'),
@@ -29,7 +31,6 @@ urlpatterns = [
     
     # Other pages
     path('pricing/', views.pricing, name='pricing'),
-    path('services/', views.services, name='services'),
     path('api/current-schedule/', views.get_current_schedule, name='get_current_schedule'),
 
     # Payment

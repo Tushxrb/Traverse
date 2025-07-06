@@ -1,164 +1,457 @@
 {% extends 'base.html' %}
 {% block title %}Admin Dashboard{% endblock %}
+
 {% block body %}
-<div class="container my-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Admin Dashboard</h2>
-    <form method="post" action="{% url 'admin_logout' %}">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-danger">Logout</button>
-    </form>
-  </div>
+<div class="container-fluid py-4">
 
-  
-  <!-- Add Employee Form -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <h5>Add New Employee</h5>
-    </div>
-    <div class="card-body">
-      <form method="post" class="row g-3">
-        {% csrf_token %}
-        <div class="col-md-3">
-          <label for="id_first_name" class="form-label">First Name</label>
-          <input type="text" id="id_first_name" name="first_name" class="form-control" placeholder="John" required />
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <h2 class="mb-1" style="color:#1e7457;">Admin Dashboard</h2>
+            <p class="text-muted mb-0">Manage employees and schedules</p>
+          </div>
+          <form method="post" action="{% url 'admin_logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger">
+              <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </button>
+          </form>
         </div>
-        <div class="col-md-3">
-          <label for="id_last_name" class="form-label">Last Name</label>
-          <input type="text" id="id_last_name" name="last_name" class="form-control" placeholder="Doe" required />
-        </div>
-        <div class="col-md-2">
-          <label for="id_dob" class="form-label">DOB</label>
-          <input type="date" id="id_dob" name="dob" class="form-control" required />
-        </div>
-        <div class="col-md-2">
-          <label for="id_address" class="form-label">Address</label>
-          <select id="id_address" name="address" class="form-select">
-            {% for addr in addresses %}
-              <option value="{{ addr }}">{{ addr }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-md-2">
-          <label for="id_employee_id_digits" class="form-label">Employee ID Digits</label>
-          <input type="text" id="id_employee_id_digits" name="employee_id_digits" class="form-control" placeholder="0001" pattern="\d+" required />
-        </div>
-        <div class="col-md-4 d-flex align-items-center">
-          <input type="checkbox" id="id_is_super_employee" name="is_super_employee" class="form-check-input me-2" />
-          <label for="id_is_super_employee" class="form-check-label mb-0">Is Super Employee?</label>
-        </div>
-        <div class="col-md-8">
-          <label for="id_team_leader" class="form-label">Team Leader (if employee)</label>
-          <select id="id_team_leader" name="team_leader" class="form-select">
-            <option value="">-- None --</option>
-            {% for tl in team_leaders %}
-              <option value="{{ tl.id }}">{{ tl.get_full_name }} ({{ tl.employee_id }})</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-12">
-          <button type="submit" class="btn btn-success">Add User</button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 
+  <!-- Messages -->
   {% if messages %}
-    <div class="mt-3">
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-          {{ message }}
-        </div>
-      {% endfor %}
+    <div class="row mb-4">
+      <div class="col-12">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      </div>
     </div>
   {% endif %}
 
-  <!-- Cutoff & Export Section -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <h5>Schedule Management</h5>
-    </div>
-    <div class="card-body">
-      <p class="text-muted">Export all schedules to Excel for vendor assignment. This will create a cutoff point and generate an Excel file with all current week schedules.</p>
-      <form method="post" action="{% url 'cutoff_schedule' %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-warning">
-          <i class="fas fa-download"></i> Cutoff & Export to Excel
-        </button>
-      </form>
+  <!-- Add Employee -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-header text-white" style="background-color:#1e7457;">
+          <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i>Add New Employee</h5>
+        </div>
+        <div class="card-body p-4">
+          <form method="post" class="row g-4">
+            {% csrf_token %}
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">First Name <span class="text-danger">*</span></label>
+              <input type="text" name="first_name" class="form-control" required />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Last Name <span class="text-danger">*</span></label>
+              <input type="text" name="last_name" class="form-control" required />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Date of Birth <span class="text-danger">*</span></label>
+              <input type="date" name="dob" class="form-control" required />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Employee ID (4 digits) <span class="text-danger">*</span></label>
+              <input type="text" name="employee_id_digits" class="form-control" pattern="\d{4}" maxlength="4" required />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Address <span class="text-danger">*</span></label>
+              <select name="address" class="form-select">
+                {% for addr in addresses %}
+                  <option value="{{ addr }}">{{ addr }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Team Leader</label>
+              <select name="team_leader" class="form-select">
+                <option value="">-- None --</option>
+                {% for tl in team_leaders %}
+                  <option value="{{ tl.id }}">{{ tl.get_full_name }} ({{ tl.employee_id }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+              <div class="form-check">
+                <input type="checkbox" name="is_super_employee" class="form-check-input" />
+                <label class="form-check-label fw-semibold">Is Team Leader?</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-lg text-white" style="background-color:#1e7457;">
+                <i class="fas fa-plus me-2"></i>Add Employee
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Existing Users Section -->
-  <div class="card">
-    <div class="card-header">
-      <h5>Existing Users</h5>
+  <!-- Schedule Management -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-light text-dark">
+          <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Schedule Management</h5>
+        </div>
+        <div class="card-body p-4">
+          <p class="text-muted mb-3">Export all schedules to Excel for vendor assignment.</p>
+          <form method="post" action="{% url 'cutoff_schedule' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-lg text-white" style="background-color:#1e7457;">
+              <i class="fas fa-download me-2"></i>Cutoff & Export to Excel
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      <ul class="list-group">
-        {% for user in employees %}
-          <li class="list-group-item">
-            <form method="post" action="{% url 'update_users' %}" class="row align-items-center g-1">
-              {% csrf_token %}
-              <input type="hidden" name="save_id" value="{{ user.id }}" />
+  </div>
 
-              <div class="col-3">
-                <label class="form-label small" for="first_name_{{ user.id }}">{{ user.first_name }} {{ user.last_name }} ({{ user.employee_id }})</label>
-                <input type="text" id="first_name_{{ user.id }}" name="first_name_{{ user.id }}" class="form-control form-control-sm mb-1" value="{{ user.first_name }}" required />
-                <input type="text" name="last_name_{{ user.id }}" class="form-control form-control-sm" value="{{ user.last_name }}" required />
-              </div>
-
-              <div class="col-2">
-                <input type="date" name="dob_{{ user.id }}" class="form-control form-control-sm" value="{{ user.dob|date:'Y-m-d' }}" required />
-              </div>
-
-              <div class="col-2">
-                <select name="address_{{ user.id }}" class="form-select form-select-sm" required>
-                  {% for addr in addresses %}
-                    <option value="{{ addr }}" {% if user.address == addr %}selected{% endif %}>{{ addr }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-
-              <div class="col-2">
-                <select name="team_leader_{{ user.id }}" class="form-select form-select-sm">
-                  <option value="">-- None --</option>
-                  {% for tl in team_leaders %}
-                    {% if user.id != tl.id %}
-                      <option value="{{ tl.id }}" {% if user.team_leader and user.team_leader.id == tl.id %}selected{% endif %}>
-                        {{ tl.get_full_name }} ({{ tl.employee_id }})
-                      </option>
+  <!-- Employee Table -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0" style="color:#1e7457;"><i class="fas fa-users me-2"></i>Employee Management</h5>
+          <div class="d-flex align-items-center">
+            <input type="text" id="employee-search" class="form-control me-2" placeholder="Search employees..." style="width: 250px;">
+            <span class="badge bg-light text-dark">{{ employees|length }} employees</span>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Employee Details</th>
+                  <th>Personal Info</th>
+                  <th>Work Info</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="employee-table-body">
+                {% for user in employees %}
+                <tr class="employee-row">
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar-circle me-3">
+                        {{ user.first_name|first }}{{ user.last_name|first }}
+                      </div>
+                      <div>
+                        <h6 class="mb-1">{{ user.first_name }} {{ user.last_name }}</h6>
+                        <span class="badge bg-secondary">{{ user.employee_id }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <small class="text-muted">DOB:</small>
+                    <div>{{ user.dob|date:'M d, Y' }}</div>
+                    <small class="text-muted">Address:</small>
+                    <div>{{ user.address }}</div>
+                  </td>
+                  <td>
+                    {% if user.is_super_employee %}
+                      <span class="badge text-white" style="background-color:#1e7457;">Team Leader</span>
+                    {% else %}
+                      <span class="badge bg-light text-dark">Employee</span>
                     {% endif %}
-                  {% endfor %}
-                </select>
-              </div>
-
-              <div class="col-1 text-center">
-                <input type="checkbox" name="is_super_employee_{{ user.id }}" class="form-check-input" {% if user.is_super_employee %}checked{% endif %} />
-              </div>
-
-              <div class="col-2 text-muted small">
-                {% if user.email %}
-                  {{ user.email }}
-                {% else %}
-                  <span class="text-muted">not yet signed up</span>
-                {% endif %}
-                <div class="d-flex mt-1">
-                  <button type="submit" class="btn btn-sm btn-primary me-1">Save</button>
-                </div>
-              </div>
-            </form>
-
-            <form method="post" action="{% url 'delete_user' user.id %}" class="mt-1">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
-            </form>
-          </li>
-        {% empty %}
-          <li class="list-group-item">No users found.</li>
-        {% endfor %}
-      </ul>
+                    {% if user.team_leader %}
+                      <div><small class="text-muted">Reports to:</small> {{ user.team_leader.get_full_name }}</div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if user.email %}
+                      <div><i class="fas fa-envelope text-success me-1"></i><small>{{ user.email }}</small></div>
+                      <span class="badge text-white" style="background-color:#1e7457;">Active</span>
+                    {% else %}
+                      <div><i class="fas fa-envelope text-muted me-1"></i><small class="text-muted">Not registered</small></div>
+                      <span class="badge bg-secondary">Pending</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="btn-group-vertical gap-1">
+                      <button class="btn btn-sm text-white" style="background-color:#1e7457;" onclick="editEmployee({{ user.id }})"><i class="fas fa-edit me-1"></i>Edit</button>
+                      <button class="btn btn-sm btn-outline-secondary" onclick="resetPassword({{ user.id }}, '{{ user.employee_id }}')"><i class="fas fa-key me-1"></i>Reset Password</button>
+                      <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee({{ user.id }}, '{{ user.get_full_name }}')"><i class="fas fa-trash me-1"></i>Delete</button>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center py-5">
+                    <div class="text-muted"><i class="fas fa-users fa-3x mb-3"></i><p>No employees found.</p></div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- Employee Search and Management -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fas fa-users me-2"></i>Employee Management
+          </h5>
+          <div class="d-flex align-items-center">
+            <input type="text" id="employee-search" class="form-control me-2" placeholder="Search employees..." style="width: 250px;">
+            <span class="badge bg-light text-dark">{{ employees|length }} employees</span>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="px-4 py-3">Employee Details</th>
+                  <th class="px-4 py-3">Personal Info</th>
+                  <th class="px-4 py-3">Work Info</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="employee-table-body">
+                {% for user in employees %}
+                  <tr class="employee-row">
+                    <td class="px-4 py-3">
+                      <div class="d-flex align-items-center">
+                        <div class="avatar-circle me-3">
+                          {{ user.first_name|first }}{{ user.last_name|first }}
+                        </div>
+                        <div>
+                          <h6 class="mb-1">{{ user.first_name }} {{ user.last_name }}</h6>
+                          <span class="badge bg-secondary">{{ user.employee_id }}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <div class="mb-2">
+                        <small class="text-muted">DOB:</small>
+                        <div>{{ user.dob|date:'M d, Y' }}</div>
+                      </div>
+                      <div>
+                        <small class="text-muted">Address:</small>
+                        <div>{{ user.address }}</div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <div class="mb-2">
+                        {% if user.is_super_employee %}
+                          <span class="badge bg-success">Team Leader</span>
+                        {% else %}
+                          <span class="badge bg-primary">Employee</span>
+                        {% endif %}
+                      </div>
+                      {% if user.team_leader %}
+                        <div>
+                          <small class="text-muted">Reports to:</small>
+                          <div>{{ user.team_leader.get_full_name }}</div>
+                        </div>
+                      {% endif %}
+                    </td>
+                    <td class="px-4 py-3">
+                      {% if user.email %}
+                        <div class="mb-1">
+                          <i class="fas fa-envelope text-success me-1"></i>
+                          <small>{{ user.email }}</small>
+                        </div>
+                        <span class="badge bg-success">Active</span>
+                      {% else %}
+                        <div class="mb-1">
+                          <i class="fas fa-envelope text-muted me-1"></i>
+                          <small class="text-muted">Not registered</small>
+                        </div>
+                        <span class="badge bg-warning">Pending Setup</span>
+                      {% endif %}
+                    </td>
+                    <td class="px-4 py-3">
+                      <div class="btn-group-vertical gap-1">
+                        <button class="btn btn-sm btn-outline-primary" onclick="editEmployee({{ user.id }})">
+                          <i class="fas fa-edit me-1"></i>Edit
+                        </button>
+                        <button class="btn btn-sm btn-outline-warning" onclick="resetPassword({{ user.id }}, '{{ user.employee_id }}')">
+                          <i class="fas fa-key me-1"></i>Reset Password
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee({{ user.id }}, '{{ user.get_full_name }}')">
+                          <i class="fas fa-trash me-1"></i>Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="5" class="text-center py-5">
+                      <div class="text-muted">
+                        <i class="fas fa-users fa-3x mb-3"></i>
+                        <p>No employees found.</p>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<!-- Edit Employee Modal -->
+<div class="modal fade" id="editEmployeeModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Employee</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="post" action="{% url 'update_users' %}" id="editEmployeeForm">
+        {% csrf_token %}
+        <div class="modal-body">
+          <input type="hidden" name="save_id" id="edit_user_id">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">First Name</label>
+              <input type="text" name="first_name" class="form-control" id="edit_first_name" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Last Name</label>
+              <input type="text" name="last_name" class="form-control" id="edit_last_name" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Date of Birth</label>
+              <input type="date" name="dob" class="form-control" id="edit_dob" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Address</label>
+              <select name="address" class="form-select" id="edit_address" required>
+                {% for addr in addresses %}
+                  <option value="{{ addr }}">{{ addr }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Team Leader</label>
+              <select name="team_leader" class="form-select" id="edit_team_leader">
+                <option value="">-- None --</option>
+                {% for tl in team_leaders %}
+                  <option value="{{ tl.id }}">{{ tl.get_full_name }} ({{ tl.employee_id }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+              <div class="form-check">
+                <input type="checkbox" name="is_super_employee" class="form-check-input" id="edit_is_super_employee">
+                <label class="form-check-label">Is Team Leader?</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Reset Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to reset the password for employee <strong id="reset_employee_name"></strong>?</p>
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i>
+          The employee will need to login using their Employee ID and Date of Birth (ddmmyyyy format) to set a new password.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form method="post" action="{% url 'admin_reset_password' %}" style="display: inline;">
+          {% csrf_token %}
+          <input type="hidden" name="employee_id" id="reset_employee_id">
+          <button type="submit" class="btn btn-warning">
+            <i class="fas fa-key me-2"></i>Reset Password
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Styles -->
+<style>
+.avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #1e7457;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+</style>
+
+<!-- Script -->
+<script>
+document.getElementById('employee-search').addEventListener('input', function(e) {
+  const searchTerm = e.target.value.toLowerCase();
+  const rows = document.querySelectorAll('.employee-row');
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(searchTerm) ? '' : 'none';
+  });
+});
+function editEmployee(userId) {
+  document.getElementById('edit_user_id').value = userId;
+  new bootstrap.Modal(document.getElementById('editEmployeeModal')).show();
+}
+function resetPassword(userId, employeeId) {
+  document.getElementById('reset_employee_id').value = employeeId;
+  document.getElementById('reset_employee_name').textContent = employeeId;
+  new bootstrap.Modal(document.getElementById('resetPasswordModal')).show();
+}
+function deleteEmployee(userId, employeeName) {
+  if (confirm(`Are you sure you want to delete ${employeeName}?`)) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/delete-user/${userId}/`;
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = csrfToken;
+    form.appendChild(csrfInput);
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+</script>
 {% endblock %}

@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 {% load static %}
 
@@ -14,6 +15,52 @@
     object-fit: cover;
     z-index: -1;
   }
+  
+  .login-container {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .login-card {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .forgot-password-link {
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+  }
+  
+  .forgot-password-link:hover {
+    color: #007bff;
+    text-decoration: underline;
+  }
+  
+  .info-text {
+    background: rgba(33, 37, 41, 0.05);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 15px;
+  }
+  
+  .btn-login {
+    background: linear-gradient(45deg, #dc3545, #c82333);
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  }
 </style>
 
 <!-- Background video -->
@@ -23,8 +70,12 @@
 </video>
 
 <div class="login-container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
-  <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
-    <h4 class="mb-3 text-center">Welcome to Traverse</h4>
+  <div class="login-card shadow p-4" style="max-width: 400px; width: 100%;">
+    <div class="text-center mb-4">
+      <h4 class="mb-2">Welcome to Traverse</h4>
+      <p class="text-muted mb-0">Sign in to your account</p>
+    </div>
+    
     <form method="post">
       {% csrf_token %}
 
@@ -37,33 +88,106 @@
       {% endif %}
 
       <div class="mb-3">
-        <label for="id_employee_id" class="form-label">Employee ID</label>
+        <label for="id_employee_id" class="form-label fw-semibold">Employee ID</label>
         <input
           type="text"
           name="employee_id"
           class="form-control"
           id="id_employee_id"
+          placeholder="Enter your Employee ID"
           required
         />
       </div>
+      
       <div class="mb-3">
-        <label for="id_password" class="form-label">Password</label>
+        <label for="id_password" class="form-label fw-semibold">Password</label>
         <input
           type="password"
           name="password"
           class="form-control"
           id="id_password"
+          placeholder="Enter your password"
           required
         />
       </div>
-      <div class="d-grid">
-        <button type="submit" class="btn btn-danger">Login</button>
+      
+      <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-danger btn-login">
+          <i class="fas fa-sign-in-alt me-2"></i>Login
+        </button>
       </div>
-      <p class="info" style="font-size: small; margin-top: 10px;">
-        <span style="color: #101010; font-weight: bold; margin-right: 5px;">&#9432;</span>
-        First-time users: use your DOB as password (ddmmyyyy).
-      </p>
+      
+      <div class="text-center mb-3">
+        <a href="#" class="forgot-password-link" onclick="showForgotPasswordModal()">
+          <i class="fas fa-question-circle me-1"></i>Forgot Password?
+        </a>
+      </div>
+      
+      <div class="info-text">
+        <div class="d-flex align-items-start">
+          <i class="fas fa-info-circle text-primary me-2 mt-1"></i>
+          <div>
+            <small class="text-muted">
+              <strong>First-time users:</strong> Use your Date of Birth as password (ddmmyyyy format).
+            </small>
+          </div>
+        </div>
+      </div>
     </form>
   </div>
 </div>
+
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="forgotPasswordModalLabel">
+          <i class="fas fa-key me-2"></i>Forgot Password
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center">
+          <div class="mb-4">
+            <i class="fas fa-lock fa-3x text-warning"></i>
+          </div>
+          <h6 class="mb-3">Need help accessing your account?</h6>
+          <p class="text-muted mb-4">
+            If you've forgotten your password or are having trouble logging in, please contact your system administrator for assistance.
+          </p>
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Contact your Admin</strong> to reset your password. They can help you regain access to your account.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-2"></i>Close
+        </button>
+        <button type="button" class="btn btn-primary" onclick="window.location.href='mailto:admin@traverse.com'">
+          <i class="fas fa-envelope me-2"></i>Contact Admin
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showForgotPasswordModal() {
+  new bootstrap.Modal(document.getElementById('forgotPasswordModal')).show();
+}
+
+// Auto-focus on employee ID field
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('id_employee_id').focus();
+});
+
+// Add some interactive feedback
+document.getElementById('id_employee_id').addEventListener('input', function(e) {
+  const value = e.target.value.toUpperCase();
+  e.target.value = value;
+});
+</script>
 {% endblock %}

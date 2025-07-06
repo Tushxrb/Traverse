@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.core.files.base import ContentFile
 
+# Import necessary models
 import json
 import random
 import logging
@@ -699,5 +700,30 @@ def start_payment(request):
     # Show pricing page for GET request
     return render(request, "pricing.html")
 
-def services(request):
-    return render(request, "services.html")
+def login_page(request):
+    return render(request, "login_page.html")
+
+@login_required
+@user_passes_test(is_admin)
+def admin_reset_password(request):
+    """Admin can reset employee password"""
+    if request.method == "POST":
+        employee_id = request.POST.get('employee_id', '').strip()
+        
+        try:
+            # Find the employee
+            employee = get_object_or_404(User, employee_id=employee_id)
+            
+            # Reset password to DOB format and clear email (forces first-time setup)
+            employee.password = make_password("temp@1234")  # Temporary password
+            employee.email = ""  # Clear email to trigger first-time setup
+            employee.save()
+            
+            messages.success(request, f"Password reset successfully for {employee.get_full_name()}. Employee must login with Employee ID and DOB to set new password.")
+            
+        except User.DoesNotExist:
+            messages.error(request, "Employee not found.")
+        except Exception as e:
+            messages.error(request, f"Error resetting password: {str(e)}")
+    
+    return redirect('admin_dashboard')
